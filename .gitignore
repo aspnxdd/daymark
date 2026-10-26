@@ -1,0 +1,9 @@
+/target/
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.db
+*.db-*
+/data/
+.DS_Store
