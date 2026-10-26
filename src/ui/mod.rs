@@ -14,7 +14,7 @@ use freya::prelude::*;
 
 use crate::model::Journal;
 use sidebar::Sidebar;
-use theme::{COLORS, daymark_theme};
+use theme::ThemePreference;
 use workspace::Workspace;
 
 pub struct DaymarkApp {
@@ -23,13 +23,16 @@ pub struct DaymarkApp {
 
 impl App for DaymarkApp {
     fn render(&self) -> impl IntoElement {
-        use_init_theme(daymark_theme);
         let mut journal = use_state(|| {
             self.initial
                 .borrow_mut()
                 .take()
                 .expect("app initializes once")
         });
+        let preference = use_state(|| ThemePreference::load(&journal.peek().store.path));
+        use_provide_context(|| preference);
+        let theme = use_init_theme(|| preference.peek().selected.theme());
+        let colors = theme.read().colors.clone();
         let search_id = use_a11y();
         let focus_mode = journal.read().focus_mode;
         rect()
@@ -39,8 +42,8 @@ impl App for DaymarkApp {
             .content(Content::flex())
             .font_family("DM Sans")
             .font_size(14.)
-            .color(COLORS.text_primary)
-            .background(COLORS.background)
+            .color(colors.text_primary)
+            .background(colors.background)
             .on_global_key_down(move |e: Event<KeyboardEventData>| {
                 if !e.modifiers.contains(Modifiers::ctrl_or_meta()) {
                     return;

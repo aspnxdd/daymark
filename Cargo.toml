@@ -10,7 +10,7 @@ license = "MIT"
 anyhow = "1.0"
 chrono = "0.4"
 directories = "6.0"
-freya = { version = "=0.5.0-rc.13", features = ["icons-lucide"] }
+freya = { version = "=0.5.0-rc.13", features = ["icons-lucide", "calendar"] }
 rusqlite = { version = "0.38", features = ["bundled"] }
 
 [dev-dependencies]

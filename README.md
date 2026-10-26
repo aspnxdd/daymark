@@ -1,18 +1,20 @@
 # Daymark 🌿
 
-A quiet, local-only desktop journal built with **Rust + Freya**, with a dark, sage-green native interface, not a webview.
+A quiet, local-only desktop journal built with **Rust + Freya**, with five selectable native themes, not a webview.
 
-![Daymark desktop journal](docs/images/daymark-desktop.png)
+![Daymark desktop journal](docs/images/daymark.png)
 
 ## The MVP
 
-- Write and edit plain-text entries, with multiline text, selection, undo/redo, and word count.
+- Write and edit plain-text entries, with multiline text, selection, undo/redo, word count, and estimated reading time.
 - Autosave each committed change to a local SQLite database.
-- Browse a month-grouped, newest-first timeline in the sidebar.
+- Browse a month-grouped, newest-first timeline and a sidebar calendar marking days with entries.
+- Export all entries for the open day to a new `.md` file, including an unsaved draft.
 - Search titles and bodies; matching is literal and Unicode-lowercased.
 - Hide the timeline for focus mode. Confirm before permanently deleting an entry.
-- Embedded **DM Sans + DM Serif Display**, reusable UI primitives, and a custom dark-green theme.
-- No account, telemetry, sync, remote fonts, network requests, or calendar.
+- Embedded **DM Sans + DM Serif Display**, reusable UI primitives, and five locally remembered themes: Sage, Ocean, Dusk, Ember, and Paper.
+- Cycle through offline writing prompts without changing your entry.
+- No account, telemetry, sync, remote fonts, or network requests.
 - Failed saves retain the draft, block navigation/deletion/normal window close, and display an error.
 
 **Local-only does not mean encrypted.** The database is plaintext. Protect it with your OS account and disk encryption. See [privacy](docs/PRIVACY.md) before storing sensitive writing.
@@ -32,7 +34,7 @@ cargo run --locked -- --data-dir /absolute/path/to/daymark-data
 cargo run --locked -- --help
 ```
 
-Daymark otherwise uses its OS local application-data directory, and creates `journal.sqlite3` there. Click **“Just you. Just this device.”** to see its exact location and privacy notes. Unix directory/file permissions are restricted to `0700`/`0600`.
+Daymark otherwise uses its OS local application-data directory, and creates `journal.sqlite3` there. Click **Privacy and storage** to see its exact location and privacy notes. Unix directory/file permissions are restricted to `0700`/`0600`.
 
 **Existing journals:** The default directory now uses Daymark's name. Existing databases remain compatible and are never moved or deleted automatically. To reopen a journal from a previous installation, run `cargo run --locked -- --data-dir /absolute/path/to/existing-journal-directory`.
 
@@ -64,4 +66,4 @@ The app starts empty; test fixtures are never seeded into your real journal.
 - [Reviewed project skills](docs/SKILLS_REVIEW.md) · [Agent rules](AGENTS.md)
 - [MVP scope and limitations](docs/PRODUCT.md) · [Roadmap](docs/ROADMAP.md)
 
-This is an MVP, not a hardened vault or packaged release. Calendar, rich text/Markdown rendering, attachments, import/export, sync, encryption and installers are intentionally absent.
+This is an MVP, not a hardened vault or packaged release. Backdating, rich text/Markdown rendering, attachments, import, sync, encryption and installers are intentionally absent.

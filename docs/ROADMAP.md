@@ -18,4 +18,4 @@ This is a priority list, not a promise or permission to expand the current MVP.
 
 ## Optional product decisions
 
-Portable export/import, tags, attachments and encrypted storage require separate requirements, privacy review and recovery design. No custom cryptography. Calendar is explicitly out of the current scope; do not add it as incidental UI polish. Accounts, sync and AI/network features are not implicit next steps for a local-only journal.
+Markdown day export and calendar navigation are implemented. Import, tags, attachments and encrypted storage require separate requirements, privacy review and recovery design. No custom cryptography. Backdating remains out of scope. Accounts, sync and AI/network features are not implicit next steps for a local-only journal.

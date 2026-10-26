@@ -19,9 +19,13 @@ Coverage includes:
 - Failed saves retaining drafts and blocking navigation/deletion.
 - CLI argument validation and Daymark's default data-directory identity.
 - The stable SQLite file-format tag across app renames.
-- Daymark branding at both supported window sizes.
+- Daymark branding and bottom-sidebar theme-menu geometry at both supported window sizes; all five options remain within the window when the menu opens upward.
 - Rendered UI typing/newlines, persisted output, Ctrl/Cmd search/new, entry switching, delete/cancel/confirm, title editing, focus mode, and minimum-size layout.
 - Independent title/body undo histories, identical-text entry isolation, search-focus restoration from focus mode, and body drag-selection stopping on release both inside and outside the editor.
+- Five distinct theme palettes, text/focus contrast, local preference round trips and malformed/unwritable/symlinked preferences; pointer/keyboard selection and editor undo preservation across palette changes.
+- Calendar leap days and month/year boundaries, multiple entries on one day, recorded-offset dates, search/date intersection, empty days and keyboard controls; filtering never replaces a failed draft.
+- Whole-day chronological Markdown export independent of search, exact Unicode/newlines, open failed/new drafts, empty days, collision/failure handling, owner-only Unix permissions and symlink refusal; export never clears SQLite save errors.
+- Inline export panel controls at both supported sizes, keyboard Cancel/Escape, live reading-time estimates and offline prompt cycling without entry mutation; decorative slogans stay absent in empty/populated journals and factual privacy information remains accessible.
 
 The screenshot generator is intentionally ignored in the normal suite:
 
@@ -29,9 +33,9 @@ The screenshot generator is intentionally ignored in the normal suite:
 cargo test --locked render_documentation_screenshot -- --ignored
 ```
 
-It writes `docs/images/daymark.png` from fictional entries in a temporary database. No demo entries are seeded into the real application. Review the image when changing layout, typography or theme.
+It writes `docs/images/daymark.png` and renders all five themes at 1360×920 and 1060×760 to a unique temporary preview directory (reported with `--nocapture`), using fictional entries and temporary databases. No demo entries are seeded into the real application. Review these images when changing layout, typography or theme.
 
-Freya-testing 0.4.3's `TestingNode::is_visible()` can panic for some text nodes with no effect-state entry. Tests use measured geometry and interaction/persistence assertions instead; native visibility and clipping still need visual checks.
+Tests use measured geometry and interaction/persistence assertions rather than relying on headless visibility helpers alone; native visibility and clipping still need visual checks.
 
 ## Native smoke check
 
@@ -44,6 +48,9 @@ Run against a disposable data directory, wait for a visible window, type a ficti
 - [ ] Text selection, cut/copy/paste, undo/redo, Unicode, CJK IME, dead keys, emoji, long documents.
 - [ ] Long-body scrolling and cursor position after edits; long titles/searches.
 - [ ] Empty journal, many entries, no search results, focus mode, error and delete panels at minimum size.
+- [ ] All five themes across restart; menu Escape/Tab/Enter, focus visibility and text contrast.
+- [ ] Calendar entry markers, month/year changes, Today, empty dates, multiple entries, search intersection and All entries reset.
+- [ ] Export the open entry's day: complete day contents even during search, failed-draft rescue, cancel/Escape, missing/unwritable folders, existing-file refusal and understandable plaintext warning.
 - [ ] Disk-full/read-only/locked storage: visible error, exact draft retained, native close vetoed; successful retry clears it.
 - [ ] Two processes: stale edit/delete cannot overwrite a newer entry; copy/recovery instructions are understandable.
 - [ ] Screen reader and high-DPI/text scaling: accessible names, focus, caret, contrast.

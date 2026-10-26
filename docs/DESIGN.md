@@ -2,11 +2,17 @@
 
 ## Direction
 
-Quiet, literary and dark. A sage-green sidebar supports a spacious dated writing surface, with Daymark's own copy, palette and typography. No calendar, ornamental dashboard or fake analytics.
+Quiet and literary. Five cohesive themes support a spacious dated writing surface, with Daymark's own typography. The sidebar calendar is compact navigation, not an ornamental dashboard or fake analytics.
+
+## UI copy
+
+Use concise labels and factual instructions, status and errors. No taglines, motivational filler, sentimental framing or decorative reassurance; remove unnecessary copy rather than replacing it with another slogan. Keep privacy and data-loss warnings explicit. Writing prompts use direct questions.
+
+The theme selector belongs at the bottom of the sidebar, after Privacy and storage. Navigation remains above the scrollable timeline.
 
 ## Tokens
 
-The authoritative values are in `src/ui/theme.rs`, not this document. Reuse `COLORS` and the initialized Freya theme:
+The authoritative values are in `src/ui/theme.rs`, not this document. Read the reactive Freya theme once at component render top; pass its palette to stateless helpers rather than using the Sage bootstrap `COLORS`. Sage's baseline is:
 
 - Near-black green background; slightly raised writing surface; deeper-green selected rows.
 - Sage primary accent for the main action, date, focus rings and saved indicator.
@@ -33,7 +39,9 @@ Use Freya's built-in button, input, focus and scrolling behavior before creating
 ## Interaction rules
 
 - New entry and search are always available outside focus mode.
-- Search narrows the sidebar only. Empty results never erase the open text.
+- Search and calendar date selection narrow the sidebar without changing the open draft. Explicit entry selection still passes the failed-save gate.
+- Theme changes and cycling prompts must not reset editor identity or undo history.
+- Export feedback is separate from SQLite save status. Exported Markdown is plaintext and never overwrites an existing file.
 - Save status distinguishes a blank page, saved entry and failed draft.
 - Delete is explicit, confirmed and disabled after a failed save.
 - Tab navigates; focus rings remain visible. Escape leaves the body field. Platform Ctrl/Cmd+N/F/S work inside title, body and search.

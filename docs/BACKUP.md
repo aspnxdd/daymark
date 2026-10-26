@@ -1,6 +1,6 @@
 # Backup and recovery
 
-The MVP has no automatic backup/export UI. Your journal is `journal.sqlite3`; click the sidebar privacy note for its exact path.
+The MVP has no automatic backup UI. **Export day .md** writes the open day's entries (including an open draft) to a new plaintext file at the path you choose; it refuses existing files. This is a readable copy, not a restorable SQLite backup. Your authoritative journal is `journal.sqlite3`; click the sidebar privacy note for its exact path.
 
 ## Make a consistent manual backup
 

@@ -5,8 +5,8 @@ description: Use when designing or reviewing Daymark layout, typography, dark co
 
 # A quiet native writing surface
 
-1. The writing is the primary content. Keep the sidebar/timeline secondary and the page spacious; no calendar, fake charts, onboarding funnel or dashboard.
-2. Reuse the sage-green theme and embedded DM fonts. Never fetch fonts, icons or imagery while running.
+1. The writing is the primary content. Keep sidebar calendar/timeline navigation secondary and the page spacious; no fake charts, onboarding funnel or dashboard.
+2. Reuse the active theme and embedded DM fonts. Never fetch fonts, icons or imagery while running.
 3. Use labeled Freya controls with visible keyboard focus, logical Tab order and contrast. Accessible roles/names are necessary, not proof of screen-reader compatibility.
 4. Respect platform Ctrl/Cmd shortcuts. New, search and save/retry must work inside text fields, without consuming ordinary text editing.
 5. Search filters the timeline, never the draft. Make empty/no-results states understandable. Focus mode hides navigation, not text or saving feedback.

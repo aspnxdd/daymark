@@ -1343,6 +1343,7 @@ dependencies = [
  "async-lock",
  "bytes",
  "cfg-if",
+ "chrono",
  "euclid",
  "freya-animation",
  "freya-core",

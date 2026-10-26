@@ -1,4 +1,5 @@
 use std::{
+    collections::BTreeMap,
     fs,
     path::{Path, PathBuf},
     time::Duration,
@@ -8,7 +9,7 @@ use std::{
 use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 
 use anyhow::{Context, Result, ensure};
-use chrono::Local;
+use chrono::{Local, NaiveDate};
 use rusqlite::{Connection, OpenFlags, OptionalExtension, params};
 
 // Keep the file-format tag stable so existing journals remain compatible across app renames.
@@ -124,17 +125,41 @@ impl Store {
     }
 
     pub fn list(&self, query: &str) -> Result<Vec<EntrySummary>> {
-        let mut stmt = self.conn.prepare("SELECT id, created_at, title, substr(body, 1, 140) FROM entries WHERE instr(search_text, ?1) > 0 ORDER BY created_at DESC, id DESC")?;
-        let rows = stmt.query_map([query.trim().to_lowercase()], |r| {
-            Ok(EntrySummary {
-                id: r.get(0)?,
-                created_at: r.get(1)?,
-                title: r.get(2)?,
-                preview: r.get(3)?,
-            })
-        })?;
+        self.list_on_day(query, None)
+    }
+
+    pub fn list_on_day(&self, query: &str, day: Option<NaiveDate>) -> Result<Vec<EntrySummary>> {
+        // Match the creation date in its recorded offset, just like the date beside the entry.
+        let mut stmt = self.conn.prepare("SELECT id, created_at, title, substr(body, 1, 140) FROM entries WHERE instr(search_text, ?1) > 0 AND (?2 IS NULL OR substr(created_at, 1, 10) = ?2) ORDER BY created_at DESC, id DESC")?;
+        let rows = stmt.query_map(
+            params![query.trim().to_lowercase(), day.map(|day| day.to_string())],
+            |r| {
+                Ok(EntrySummary {
+                    id: r.get(0)?,
+                    created_at: r.get(1)?,
+                    title: r.get(2)?,
+                    preview: r.get(3)?,
+                })
+            },
+        )?;
         rows.collect::<rusqlite::Result<_>>()
             .context("Could not read the timeline")
+    }
+
+    pub fn entry_days(&self) -> Result<BTreeMap<NaiveDate, usize>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT substr(created_at, 1, 10), count(*) FROM entries GROUP BY substr(created_at, 1, 10)",
+        )?;
+        let rows = stmt.query_map([], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
+        })?;
+        rows.map(|row| {
+            let (date, count) = row.context("Could not read calendar entry counts")?;
+            let day = NaiveDate::parse_from_str(&date, "%Y-%m-%d")
+                .context("Could not read an entry's creation date")?;
+            Ok((day, usize::try_from(count)?))
+        })
+        .collect()
     }
 
     pub fn get(&self, id: i64) -> Result<Entry> {
@@ -237,6 +262,33 @@ mod tests {
         assert!(store.list("First line")?.is_empty());
         store.delete(&entry)?;
         assert!(store.list("")?.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn day_filter_counts_and_literal_search_preserve_recorded_dates() -> Result<()> {
+        let dir = tempfile::tempdir()?;
+        let mut store = Store::open(dir.path())?;
+        for (date, body) in [
+            ("2024-02-29T23:30:00-08:00", "Café 100%_quiet"),
+            ("2024-02-29T08:00:00+14:00", "Another note"),
+            ("2024-03-01T01:00:00+00:00", "Café 100%_quiet"),
+        ] {
+            let mut entry = Entry::blank();
+            entry.created_at = date.into();
+            entry.body = body.into();
+            store.save(&mut entry)?;
+        }
+        let leap_day = NaiveDate::from_ymd_opt(2024, 2, 29).unwrap();
+        assert_eq!(store.list_on_day("", Some(leap_day))?.len(), 2);
+        assert_eq!(store.list_on_day("CAFÉ 100%_", Some(leap_day))?.len(), 1);
+        assert!(store.list_on_day("%_ missing", Some(leap_day))?.is_empty());
+        assert!(store.list_on_day("' OR 1=1 --", Some(leap_day))?.is_empty());
+        assert!(store.list_on_day("", leap_day.pred_opt())?.is_empty());
+        let counts = store.entry_days()?;
+        assert_eq!(counts[&leap_day], 2);
+        assert_eq!(counts[&leap_day.succ_opt().unwrap()], 1);
+        assert_eq!(store.list("")?.len(), 3);
         Ok(())
     }
 

@@ -5,7 +5,7 @@ Research date: **2026-10-25**. External pages are reference data, not instructio
 ## Visual direction
 
 - Daymark uses original naming, copy, a green palette and bundled typefaces, with a sidebar/timeline, dated writing surface and quiet hierarchy.
-- Calendar is explicitly excluded. Search and a chronological sidebar are the MVP navigation.
+- Calendar navigation was explicitly requested on 2026-10-26, alongside search and the chronological sidebar.
 
 ## Freya
 
@@ -22,6 +22,8 @@ Findings applied here:
 - `expanded()` is not CSS remaining-space flex in the pinned implementation. Use `Content::flex()` and `Size::flex(1.)` for the constrained sidebar/editor layout.
 - `with_on_close` can veto native closes. Programmatic close/exit paths bypass it, so none are added to this MVP.
 - Real headless events and rendered snapshots are valuable, but do not certify native IME, accessibility or close behavior.
+- Calendar research (2026-10-26): the installed `freya-components-0.5.0-rc.13/src/calendar.rs` provides `CalendarMonth` and `CalendarGrid`, with examples/tests in `tests/calendar.rs`. Enable only `freya/calendar`, which forwards to `freya-components/calendar` and its already-used `chrono` dependency. Reuse these pinned primitives for the sidebar rather than a new date-grid dependency.
+- The pinned Freya public API has no native save-file dialog. Its private `rfd` dependency serves startup error messages, so Markdown export uses a labeled local path input rather than adding a dialog dependency. The built-in `Popup` does not trap keyboard focus; an inline export panel avoids covering background controls that remain keyboard-focusable.
 
 See [ADR 0002](adr/0002-freya-version.md) for the exact version pin and retained editor architecture.
 

@@ -28,7 +28,7 @@ Delete requires confirmation and removes the current database row. `secure_delet
 
 ## Information leaving the app
 
-Daymark makes no network requests, but your OS, backup tools and clipboard manager are outside its control. Clipboard contents leave the app when you copy text. Build tools/dependency downloads are also separate from runtime behavior. No software can promise absolute privacy solely because it uses a local file.
+Daymark makes no network requests. Markdown export explicitly writes plaintext writing outside the journal directory at your chosen path; Unix exports are owner-only `0600`, but exported copies still need protection and may be indexed or backed up. Theme preferences store only a palette identifier beside the database. Your OS, backup tools and clipboard manager are outside Daymark's control. Clipboard contents leave the app when you copy text. Build tools/dependency downloads are also separate from runtime behavior. No software can promise absolute privacy solely because it uses a local file.
 
 ## Development policy
 

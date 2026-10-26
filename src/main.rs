@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+mod export;
 mod model;
 mod storage;
 mod ui;
@@ -47,7 +48,7 @@ fn main() -> Result<()> {
                 WindowConfig::new_app(ui::DaymarkApp {
                     initial: RefCell::new(Some(journal)),
                 })
-                .with_title("Daymark · A little space for your days")
+                .with_title("Daymark")
                 .with_app_id("dev.daymark.journal")
                 .with_size(1360., 920.)
                 .with_min_size(1060., 760.)
@@ -68,7 +69,7 @@ fn data_directory(args: Vec<std::ffi::OsString>) -> Result<Option<PathBuf>> {
     match args.as_slice() {
         [flag] if flag == "--help" || flag == "-h" => {
             println!(
-                "Daymark: a local-only journal\n\nUsage: daymark [--data-dir PATH]\n\nUse a dedicated data directory. No network, accounts, or calendar.\nThe local SQLite database is NOT encrypted. See docs/PRIVACY.md."
+                "Daymark: a local-only journal\n\nUsage: daymark [--data-dir PATH]\n\nUse a dedicated data directory. No network or accounts.\nThe local SQLite database is NOT encrypted. See docs/PRIVACY.md."
             );
             Ok(None)
         }

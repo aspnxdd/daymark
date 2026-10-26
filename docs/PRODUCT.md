@@ -10,16 +10,20 @@ The application is named **Daymark**. It is a native Freya/Skia window, not Elec
 
 - Multiple entries per day, with title, multiline body and immutable creation date.
 - Newest-first sidebar grouped by local creation month. Selecting an entry restores its text.
+- Compact sidebar calendar with entry-day marks, month navigation, Today, and an all-entries reset. Date filtering combines with search; creation dates cannot be changed.
+- Five selectable themes remembered locally: Sage, Ocean, Dusk, Ember, and Paper.
+- Export the open day as a new plaintext Markdown file, including all its entries and any open draft. Existing files are never overwritten.
 - Immediate per-edit local commits; title-only entries are valid. A completely blank new draft creates no database row.
 - Literal substring search across title and body, ignoring surrounding query whitespace and using Rust Unicode lowercase. `%`, `_`, quotes and SQL-looking text are literals.
-- Word count over body whitespace; focus mode; save status; inline errors; retry save.
+- Word count over body whitespace and estimated reading time; focus mode; save status; inline errors; retry save.
+- A small set of offline writing prompts, cycled on request without changing the draft.
 - Delete confirmation and optimistic revision checks against concurrent windows.
 - Empty and no-results states; searching never replaces the open draft.
 - Keyboard-accessible controls, platform Ctrl/Cmd shortcuts, offline embedded fonts.
 
 ## Deliberately missing
 
-No calendar view/date picker/backdating, rich text, Markdown preview, tags, mood tracking, attachments, account, cloud, sync, encryption, import/export, automatic backups, settings screen, multiple windows UI, installer or auto-update.
+No backdating, rich text, Markdown preview, tags, mood tracking, attachments, account, cloud, sync, encryption, import, automatic backups, settings screen, multiple windows UI, installer or auto-update.
 
 ## Known MVP limits
 

@@ -1,7 +1,5 @@
 use freya::{icons::lucide, prelude::*};
 
-use super::theme::COLORS;
-
 #[derive(Clone, Copy, PartialEq)]
 pub enum Icon {
     Leaf,
@@ -34,17 +32,39 @@ pub fn icon(kind: Icon, size: f32, color: Color) -> SvgViewer {
 }
 
 pub fn caption(text: impl Into<String>) -> impl IntoElement {
-    label()
-        .text(text.into())
-        .font_size(11.)
-        .color(COLORS.text_secondary)
+    Caption { text: text.into() }
+}
+
+#[derive(PartialEq)]
+struct Caption {
+    text: String,
+}
+
+impl Component for Caption {
+    fn render(&self) -> impl IntoElement {
+        let colors = use_theme().read().colors.clone();
+        label()
+            .text(self.text.clone())
+            .font_size(11.)
+            .color(colors.text_secondary)
+    }
 }
 
 pub fn divider() -> impl IntoElement {
-    rect()
-        .width(Size::fill())
-        .height(Size::px(1.))
-        .background(COLORS.border)
+    Divider
+}
+
+#[derive(PartialEq)]
+struct Divider;
+
+impl Component for Divider {
+    fn render(&self) -> impl IntoElement {
+        let colors = use_theme().read().colors.clone();
+        rect()
+            .width(Size::fill())
+            .height(Size::px(1.))
+            .background(colors.border)
+    }
 }
 
 #[derive(PartialEq)]
@@ -58,27 +78,33 @@ pub struct Action {
 impl Component for Action {
     fn render(&self) -> impl IntoElement {
         let on_press = self.on_press.clone();
+        let colors = use_theme().read().colors.clone();
         let color = if self.primary {
-            COLORS.text_inverse
+            colors.text_inverse
         } else {
-            COLORS.text_secondary
+            colors.text_secondary
         };
         Button::new()
             .background(if self.primary {
-                COLORS.primary
+                colors.primary
             } else {
-                COLORS.surface_secondary
+                colors.surface_secondary
             })
             .hover_background(if self.primary {
-                Color::from_rgb(194, 221, 179)
+                colors.primary
             } else {
-                COLORS.active
+                colors.active
+            })
+            .focus_border_fill(if self.primary {
+                colors.text_inverse
+            } else {
+                colors.border_focus
             })
             .color(color)
             .border_fill(if self.primary {
-                COLORS.primary
+                colors.primary
             } else {
-                COLORS.border
+                colors.border
             })
             .corner_radius(8.)
             .padding((11., 16.))

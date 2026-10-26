@@ -41,6 +41,10 @@ The simplification pass used the already installed [Ponytail skill](https://gith
 
 The local `freya-ui` skill was aligned with the exact crates.io sources for Freya 0.5.0-rc.13 (`Input`, editable events, component keys and pointer dispatch), not floating main or a newly imported skill. It records the padding API, layout-aware keyboard context and global pointer-up behavior. Headless tests cover title/search-to-body focus, undo isolation and selection release inside/outside the editor; native IME and assistive technology still need platform checks. This is a source/API review, not a full transitive dependency security audit.
 
+## Requested navigation/themes follow-up (2026-10-26)
+
+The locally authored `native-desktop-ux` guidance now allows the explicitly requested compact calendar navigation and refers to the active palette rather than Sage alone. This is a product-scope correction, not an imported skill update; no external instructions, scripts, packages or permissions were added. Calendar API provenance and the narrow Freya feature are recorded in [RESEARCH.md](RESEARCH.md). Native accessibility and platform behavior remain manual verification gaps.
+
 ## Updating safely
 
 1. Fetch source as text, pin its revision and inspect the full proposed file and relevant linked instructions.

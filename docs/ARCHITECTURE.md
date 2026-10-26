@@ -4,14 +4,15 @@
 main.rs                 CLI, OS data path, store startup, fonts, native close veto
    │
 ui/mod.rs               DaymarkApp state initialization and global shortcuts
-ui/sidebar.rs           search, month-grouped timeline and navigation
-ui/workspace.rs         writing layout, confirmation/error/privacy UI and prompt
+ui/sidebar.rs           search, calendar and month-grouped timeline navigation
+ui/workspace.rs         writing layout, confirmation/errors, export UI and prompts
 ui/editor.rs            title Input + multiline Freya editable paragraph
 ui/components.rs        reusable Action, icons, captions, prose, dividers
-ui/theme.rs             one dark-green palette and Freya Theme
+ui/theme.rs             five palettes, reactive Freya Theme and local preference
    │ events
 model.rs / Journal      open draft, search, selection, saving, errors, editor generation
    │ typed operations
+export.rs / Journal     day Markdown formatting and exclusive private-file output
 storage.rs / Store      one rusqlite connection, schema, SQL, transactions, permissions
    │
 journal.sqlite3         authoritative local data
@@ -20,6 +21,8 @@ journal.sqlite3         authoritative local data
 ## State flow
 
 `DaymarkApp` initializes one `State<Journal>`. Child components receive that handle rather than their own copies of database state. An edit updates `Journal::draft`, calls `Store::save`, and refreshes the filtered timeline. Search updates only `query` and summaries; it never swaps the draft.
+
+Theme selection updates shared reactive Freya theme state; a small preference file beside the database remembers only the theme, never journal contents. The calendar reuses pinned Freya's `CalendarMonth`/`CalendarGrid` behind the narrow `calendar` feature. Calendar/search state and all journal access remain in `Journal`/`Store`; rendering never queries SQLite.
 
 The title uses Freya's single-line `Input`. The body retains the tested `use_editable`/`RopeEditor` engine with one wrapped paragraph and a bounded `ScrollView` on pinned Freya 0.5.0-rc.13. It is plain text, not HTML or remotely rendered Markdown.
 

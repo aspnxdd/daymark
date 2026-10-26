@@ -1,6 +1,5 @@
 use freya::{prelude::*, text_edit::*};
 
-use super::theme::COLORS;
 use crate::model::Journal;
 
 #[derive(PartialEq)]
@@ -22,6 +21,7 @@ impl Component for WritingArea {
 
     fn render(&self) -> impl IntoElement {
         let mut journal = self.journal;
+        let colors = use_theme().read().colors.clone();
         let title = use_state(|| journal.peek().draft.title.clone());
         rect()
             .height(Size::flex(1.))
@@ -33,11 +33,11 @@ impl Component for WritingArea {
                     Input::new(title)
                         .on_pre_key_down(single_line_key_policy)
                         .width(Size::fill())
-                        .placeholder("Give this day a title…")
-                        .background(COLORS.surface_secondary)
-                        .focus_background(COLORS.surface_secondary)
+                        .placeholder("Entry title…")
+                        .background(colors.surface_secondary)
+                        .focus_background(colors.surface_secondary)
                         .border_fill(Color::TRANSPARENT)
-                        .placeholder_color(COLORS.text_placeholder)
+                        .placeholder_color(colors.text_placeholder)
                         .padding((4., 0.))
                         .on_validate(move |value: InputValidator| {
                             journal.write().edit_title(value.text().to_string())
@@ -56,6 +56,7 @@ struct BodyEditor {
 impl Component for BodyEditor {
     fn render(&self) -> impl IntoElement {
         let mut journal = self.journal;
+        let colors = use_theme().read().colors.clone();
         let holder = use_state(ParagraphHolder::default);
         let mut editable = use_editable(|| journal.peek().draft.body.clone(), EditableConfig::new);
         let a11y = use_a11y();
@@ -79,7 +80,7 @@ impl Component for BodyEditor {
                     .a11y_alt("Journal entry. Changes save automatically to this device.")
                     .cursor(CursorIcon::Text)
                     .border(Border::new().width(1.).fill(if focus() == Focus::Keyboard {
-                        COLORS.border_focus
+                        colors.border_focus
                     } else {
                         Color::TRANSPARENT
                     }))
@@ -136,17 +137,17 @@ impl Component for BodyEditor {
                             .font_size(17.)
                             .line_height(1.8)
                             .color(if empty {
-                                COLORS.text_placeholder
+                                colors.text_placeholder
                             } else {
-                                COLORS.text_primary
+                                colors.text_primary
                             })
                             .cursor_index(if focused {
                                 Some(editable.editor().read().cursor_pos())
                             } else {
                                 None
                             })
-                            .cursor_color(COLORS.primary)
-                            .highlight_color(COLORS.text_highlight)
+                            .cursor_color(colors.primary)
+                            .highlight_color(colors.text_highlight)
                             .highlights(if focused {
                                 editable.editor().read().get_selection().map(|s| vec![s])
                             } else {
@@ -170,7 +171,7 @@ impl Component for BodyEditor {
                                 });
                             })
                             .span(if empty {
-                                "Start anywhere. What’s on your mind?".to_string()
+                                "Entry text…".to_string()
                             } else {
                                 text
                             })

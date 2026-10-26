@@ -5,7 +5,7 @@ Daymark is a Rust/Freya native desktop journal. Keep the MVP small, local-only, 
 ## Non-negotiable rules
 
 1. Read the files you change and every caller. Preserve the architecture: UI → `Journal` → `Store`.
-2. No calendar yet. No accounts, telemetry, remote content, sync, runtime network, or browser/webview framework.
+2. Calendar is navigation only; no backdating. No accounts, telemetry, remote content, sync, runtime network, or browser/webview framework.
 3. SQLite is authoritative. Bind all user-controlled SQL values. Never add SQLx compile-check macros.
 4. Never mark a save successful until commit succeeds. Do not discard a failed draft on navigation, deletion, or close.
 5. Do not log entries, search strings, clipboard contents, or database contents. Use fictional test data only.
@@ -14,6 +14,7 @@ Daymark is a Rust/Freya native desktop journal. Keep the MVP small, local-only, 
 8. Reuse `src/ui/theme.rs` and `src/ui/components.rs`. Maintain keyboard navigation, visible focus, contrast, and readable typography.
 9. Keep `Cargo.lock`. Review dependency features; do not enable Freya `all` or `remote-asset`.
 10. Add a focused test for nontrivial logic. Run format, Clippy and the full suite before claiming completion.
+11. Keep UI copy plain and functional. No slogans, motivational filler, cozy marketing language or decorative reassurance; retain factual privacy, save-status and error messages.
 
 ## Read on demand
 

@@ -102,10 +102,10 @@ fn shortcut(test: &mut TestingRunner, key: &str) {
 }
 
 #[test]
-fn daymark_branding_fits_supported_window_sizes() {
+fn sidebar_brand_and_footer_theme_menu_fit_supported_window_sizes() {
     for (width, height) in [(1360., 920.), (1060., 760.)] {
-        let (_dir, test) = fixture(false, width, height);
-        for text in ["Daymark", "DAYMARK / LOCAL JOURNAL"] {
+        let (_dir, mut test) = fixture(false, width, height);
+        for text in ["Daymark", "Theme: Sage"] {
             let brand = test
                 .find(|node, element| {
                     Label::try_downcast(element)
@@ -117,6 +117,28 @@ fn daymark_branding_fits_supported_window_sizes() {
             assert!(area.width() > 0. && area.height() > 0.);
             assert!(area.min_x() >= 0. && area.max_x() <= 280.);
             assert!(area.min_y() >= 0. && area.max_y() <= height);
+            if text == "Theme: Sage" {
+                assert!(area.min_y() > height - 70.);
+            }
+        }
+        click_label(&mut test, "Theme: Sage");
+        test.poll_n(std::time::Duration::from_millis(5), 30);
+        for id in theme::ThemeId::ALL {
+            let name = if id == theme::ThemeId::Sage {
+                "Sage · selected"
+            } else {
+                id.name()
+            };
+            let item = test
+                .find(|node, element| {
+                    Label::try_downcast(element)
+                        .filter(|label| label.text.as_ref() == name)
+                        .map(|_| node)
+                })
+                .expect("theme option is rendered above footer");
+            let area = item.layout().area;
+            assert!(area.min_x() >= 0. && area.max_x() <= 280.);
+            assert!(area.min_y() >= 0. && area.max_y() < height - 40.);
         }
     }
 }
@@ -124,7 +146,7 @@ fn daymark_branding_fits_supported_window_sizes() {
 #[test]
 fn writing_search_navigation_delete_and_reopen() {
     let (dir, mut test) = fixture(false, 1360., 920.);
-    let body = paragraph_node(&test, "Start anywhere. What’s on your mind?");
+    let body = paragraph_node(&test, "Entry text…");
     click(&mut test, body);
     test.write_text("First thought 🌿");
     test.press_key(Key::Named(NamedKey::Enter));
@@ -149,13 +171,7 @@ fn writing_search_navigation_delete_and_reopen() {
     assert!(paragraph_node(&test, expected).layout().area.height() > 0.);
 
     shortcut(&mut test, "n");
-    assert!(
-        paragraph_node(&test, "Start anywhere. What’s on your mind?")
-            .layout()
-            .area
-            .height()
-            > 0.
-    );
+    assert!(paragraph_node(&test, "Entry text…").layout().area.height() > 0.);
     let previous = paragraph_node(&test, "Untitled entry");
     click(&mut test, previous);
     assert!(paragraph_node(&test, expected).layout().area.height() > 0.);
@@ -186,7 +202,7 @@ fn writing_search_navigation_delete_and_reopen() {
 #[test]
 fn title_focus_mode_and_minimum_window_layout() {
     let (dir, mut test) = fixture(false, 1060., 760.);
-    let title = paragraph_node(&test, "Give this day a title…");
+    let title = paragraph_node(&test, "Entry title…");
     click(&mut test, title);
     test.write_text("A quiet Sunday");
     shortcut(&mut test, "s");
@@ -199,22 +215,16 @@ fn title_focus_mode_and_minimum_window_layout() {
     let title = paragraph_node(&test, "A quiet Sunday");
     click(&mut test, title);
     shortcut(&mut test, "n");
-    assert!(
-        paragraph_node(&test, "Give this day a title…")
-            .layout()
-            .area
-            .height()
-            > 0.
-    );
+    assert!(paragraph_node(&test, "Entry title…").layout().area.height() > 0.);
 }
 
 #[test]
 fn undo_is_isolated_between_fields_and_identical_entries() {
     let (dir, mut test) = fixture(false, 1360., 920.);
-    let title = paragraph_node(&test, "Give this day a title…");
+    let title = paragraph_node(&test, "Entry title…");
     click(&mut test, title);
     test.write_text("Same title");
-    let body = paragraph_node(&test, "Start anywhere. What’s on your mind?");
+    let body = paragraph_node(&test, "Entry text…");
     click(&mut test, body);
     test.write_text("Same body");
     let store = Store::open(dir.path()).unwrap();
@@ -227,19 +237,19 @@ fn undo_is_isolated_between_fields_and_identical_entries() {
     click(&mut test, title);
     shortcut(&mut test, "z");
     assert_eq!(store.get(first).unwrap().title, "");
-    let title = paragraph_node(&test, "Give this day a title…");
+    let title = paragraph_node(&test, "Entry title…");
     click(&mut test, title);
     test.write_text("Same title");
-    let body = paragraph_node(&test, "Start anywhere. What’s on your mind?");
+    let body = paragraph_node(&test, "Entry text…");
     click(&mut test, body);
     test.write_text("Same body");
     assert_eq!(store.get(first).unwrap().body, "Same body");
 
     shortcut(&mut test, "n");
-    let title = paragraph_node(&test, "Give this day a title…");
+    let title = paragraph_node(&test, "Entry title…");
     click(&mut test, title);
     test.write_text("Same title");
-    let body = paragraph_node(&test, "Start anywhere. What’s on your mind?");
+    let body = paragraph_node(&test, "Entry text…");
     click(&mut test, body);
     test.write_text("Same body");
     let second = store.list("").unwrap()[0].id;
@@ -276,7 +286,7 @@ fn search_shortcut_restores_timeline_from_focus_mode() {
             .height()
             > 0.
     );
-    let body = paragraph_node(&test, "Start anywhere. What’s on your mind?");
+    let body = paragraph_node(&test, "Entry text…");
     click(&mut test, body);
     test.write_text("A private thought");
     assert!(
@@ -292,7 +302,7 @@ fn search_shortcut_restores_timeline_from_focus_mode() {
 fn body_drag_selection_stops_after_release() {
     for release_outside in [false, true] {
         let (_dir, mut test) = fixture(false, 1360., 920.);
-        let body = paragraph_node(&test, "Start anywhere. What’s on your mind?");
+        let body = paragraph_node(&test, "Entry text…");
         click(&mut test, body);
         test.write_text("abcdefghij");
         test.render();
@@ -331,9 +341,104 @@ fn body_drag_selection_stops_after_release() {
 }
 
 #[test]
+fn themes_preserve_writing_and_undo_and_remember_the_selection() {
+    let (dir, mut test) = fixture(false, 1060., 760.);
+    let body = paragraph_node(&test, "Entry text…");
+    click(&mut test, body);
+    test.write_text("A fictional note to keep through five palettes.");
+    let store = Store::open(dir.path()).unwrap();
+    let entry = store.list("").unwrap()[0].id;
+    let mut selected = theme::ThemeId::Sage;
+    for next in theme::ThemeId::ALL.into_iter().skip(1) {
+        click_label(&mut test, &format!("Theme: {}", selected.name()));
+        test.poll_n(std::time::Duration::from_millis(5), 30);
+        click_label(&mut test, next.name());
+        test.poll_n(std::time::Duration::from_millis(5), 30);
+        assert_eq!(
+            std::fs::read_to_string(store.path.with_extension("theme"))
+                .unwrap()
+                .trim(),
+            next.name().to_lowercase(),
+        );
+        assert!(
+            paragraph_node(&test, "A fictional note to keep through five palettes.")
+                .layout()
+                .area
+                .height()
+                > 0.
+        );
+        selected = next;
+    }
+    let body = paragraph_node(&test, "A fictional note to keep through five palettes.");
+    click(&mut test, body);
+    shortcut(&mut test, "z");
+    assert_eq!(store.get(entry).unwrap().body, "");
+    assert!(paragraph_node(&test, "Entry text…").layout().area.height() > 0.);
+}
+
+#[test]
+fn decorative_copy_is_removed_but_privacy_information_remains_accessible() {
+    for seed in [false, true] {
+        let (_dir, mut test) = fixture(seed, 1060., 760.);
+        click_label(&mut test, "Privacy and storage");
+        assert!(
+            test.find(|_, element| Paragraph::try_downcast(element)
+                .filter(|p| p.spans.iter().any(|s| s.text.contains("NOT encrypted")))
+                .map(|_| ()))
+                .is_some()
+        );
+        for removed in [
+            "SLOW DOWN. NOTICE MORE.",
+            "Keep it here.",
+            "A LITTLE SPACE FOR YOUR DAYS",
+            "Just you. Just this device.",
+            "DAYMARK / LOCAL JOURNAL",
+            "Your story starts here.",
+            "Write your first entry. It will find a home in this timeline.",
+            "A new page in your story",
+            "A fresh page",
+            "A moment kept",
+            "Your words stay here.",
+            "A SMALL INVITATION",
+            "Not every day needs to be extraordinary to be worth remembering.",
+        ] {
+            assert!(
+                test.find(|_, element| {
+                    let label = Label::try_downcast(element)
+                        .is_some_and(|label| label.text.as_ref() == removed);
+                    let paragraph = Paragraph::try_downcast(element)
+                        .is_some_and(|p| p.spans.iter().any(|s| s.text == removed));
+                    (label || paragraph).then_some(())
+                })
+                .is_none(),
+                "decorative copy is still rendered: {removed}"
+            );
+        }
+    }
+}
+
+#[test]
 #[ignore = "Generate a documentation screenshot using fictional test entries"]
 fn render_documentation_screenshot() {
-    let (_dir, mut test) = fixture(true, 1360., 920.);
+    let previews = tempfile::tempdir().unwrap().keep();
     std::fs::create_dir_all("docs/images").unwrap();
-    test.render_to_file("docs/images/daymark.png");
+    for (width, height) in [(1360., 920.), (1060., 760.)] {
+        for id in theme::ThemeId::ALL {
+            let (_dir, mut test) = fixture(true, width, height);
+            test.animation_clock().disable();
+            if id != theme::ThemeId::Sage {
+                click_label(&mut test, "Theme: Sage");
+                test.poll_n(std::time::Duration::from_millis(5), 30);
+                click_label(&mut test, id.name());
+                test.poll_n(std::time::Duration::from_millis(5), 30);
+            }
+            test.render_to_file(previews.join(format!("{}-{width}.png", id.name())));
+            if id == theme::ThemeId::Sage && width == 1360. {
+                test.render_to_file("docs/images/daymark.png");
+            }
+            click_label(&mut test, "Export day .md");
+            test.render_to_file(previews.join(format!("{}-{width}-export.png", id.name())));
+        }
+    }
+    eprintln!("Fictional theme previews: {}", previews.display());
 }
